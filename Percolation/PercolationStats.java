@@ -4,7 +4,6 @@ import edu.princeton.cs.algs4.StdStats;
 import java.lang.Math;
 import java.lang.Integer;
 
-
 public class PercolationStats {
     private Percolation grids;
     private double[] records;
@@ -14,39 +13,39 @@ public class PercolationStats {
         if (n <= 0 || trials <= 0){
             throw new IllegalArgumentException();
         }
-        this.records = new double[trials];
+        records = new double[trials];
         for (int num = 0; num < trials; num++) {
-            this.grids = new Percolation(n);
+            grids = new Percolation(n);
             int openSites = 0;
-            while (!this.grids.percolates()) {
+            while (!grids.percolates()) {
                 int i = StdRandom.uniform(1, n + 1);
                 int j = StdRandom.uniform(1, n + 1);
-                if (!this.grids.isOpen(i, j)) {
-                    this.grids.open(i, j);
+                if (!grids.isOpen(i, j)) {
+                    grids.open(i, j);
                     openSites++;
                 }
             }
-            this.records[num] = (double) openSites / (n * n);
+            records[num] = (double) openSites / (n * n);
         }
     }
     // sample mean of percolation threshold
     public double mean(){
-        return StdStats.mean(this.records);
+        return StdStats.mean(records);
     }
 
     // sample standard deviation of percolation threshold
     public double stddev(){
-        return StdStats.stddev(this.records);
+        return StdStats.stddev(records);
 
     }
     // low  endpoint of 95% confidence interval
     public double confidenceLo()  {
-        return mean() - (1.96 * stddev() / Math.sqrt(this.records.length));
+        return mean() - (1.96 * stddev() / Math.sqrt(records.length));
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi()  {
-        return mean() + (1.96 * stddev() / Math.sqrt(this.records.length));
+        return mean() + (1.96 * stddev() / Math.sqrt(records.length));
     }
 
     public static void main(String[] args) {
