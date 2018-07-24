@@ -1,2 +1,2 @@
-# coursera-princeton-algorithm
-Assignments for coursera princenton algorithm class
+# coursera_princeton_algorithm
+Assignments for coursera princenton algorithm 
