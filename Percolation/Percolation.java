@@ -8,7 +8,6 @@ public class Percolation {
     private int gridSize;
     private final int topIndex;
     private final int bottomIndex;
-    private static int numOpenSites = 0;
 
     public Percolation(int n) {
         if (n <= 0) {
@@ -19,9 +18,14 @@ public class Percolation {
         bottomIndex = n*n+1;
         id = new WeightedQuickUnionUF(n * n + 2);
         normalID = new WeightedQuickUnionUF(n * n + 1);
-        openSites = new boolean[n * n + 2];
-        openSites[topIndex] = true;
-        openSites[bottomIndex] = true;
+        openSites = new boolean[n * n];
+    }
+
+    private int getOpenIndex(int i, int j){
+        if (i < 1 || i > gridSize || j < 1 || j > gridSize) {
+            throw new IllegalArgumentException("Index out of bounds");
+        }
+        return (i-1) * gridSize + (j-1);
     }
 
     private int getIndex(int i, int j){
@@ -38,8 +42,8 @@ public class Percolation {
         }
 
         int index = getIndex(row,col);
-        openSites[index] = true;
-        numOpenSites++;
+        int openIndex = getOpenIndex(row, col);
+        openSites[openIndex] = true;
 
         //if firstrow or last row, connect to fake top and bottom
         if (row == 1) {
@@ -63,11 +67,15 @@ public class Percolation {
     }
 
     public boolean isOpen(int row, int col){
-        return openSites[getIndex(row, col)];
+        return openSites[getOpenIndex(row, col)];
     }
 
     public int numberOfOpenSites(){
-        return numOpenSites;
+        int count = 0;
+        for (boolean val : openSites){
+            if (val == true) count ++;
+        }
+        return count;
     }
 
     public boolean percolates(){
