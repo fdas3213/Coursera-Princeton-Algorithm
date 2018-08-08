@@ -8,7 +8,7 @@ public class RandomizedQueue<Item> {
     //create randomized queue using resized array
     private class ResizingArray{
         private Item[] array;
-        private int N = 1;
+        private int N = 0;
     }
 
     private ResizingArray RdQueue;
