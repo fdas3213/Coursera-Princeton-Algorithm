@@ -4,7 +4,7 @@ import java.lang.*;
 import java.util.NoSuchElementException;
 
 //Implements Deque using a Linkedlist structure
-//public class Deque<Item> implements Iterable<Item> {
+//public class Deque<Item> implements Iterable<Item>{
 public class Deque<Item>{
 
     private class Node{
@@ -12,7 +12,7 @@ public class Deque<Item>{
         Node prev;
         Node next;
 
-        private Node(Item item){
+        Node(Item item){
             this.item = item;
         }
     }
@@ -21,7 +21,7 @@ public class Deque<Item>{
     private Node tail;
     private int size;
 
-    // construct an empty deque
+    // construct an empty deque with dummy head and tail
     public Deque() {
         head = new Node(null);
         tail = new Node(null);
@@ -61,13 +61,14 @@ public class Deque<Item>{
         }
 
         Node newNode = new Node(item);
-        newNode.prev = tail.prev;
         newNode.next = tail;
+        newNode.prev = tail.prev;
         tail.prev.next = newNode;
         tail.prev = newNode;
         size ++;
     }
 
+    @Override
     public String toString(){
         String s = "[ ";
         while (head.next != tail){
@@ -78,6 +79,7 @@ public class Deque<Item>{
         s += "]";
         return s;
     }
+
 
     // remove and return the item from the front
     public Item removeFirst(){
@@ -91,15 +93,44 @@ public class Deque<Item>{
         size --;
 
         return first.item;
-
     }
 
-/*
+    // remove and return the item from the end
+    public Item removeLast(){
+        if (size == 0){
+            throw new NoSuchElementException("Deque is now empty");
+        }
 
-    public Item removeLast()                 // remove and return the item from the end
+        Node last = tail.prev;
+        tail.prev = last.prev;
+        tail.prev.next = tail;
+        size --;
 
-    public Iterator<Item> iterator()       // return an iterator over items in order from front to end
-*/
+        return last.item;
+    }
+
+    // return an iterator over items in order from front to end
+    public Iterator<Item> iterator(){ return new DequeIterator();}
+
+    private class DequeIterator implements Iterator<Item>{
+        private Node curr = head;
+
+        public boolean hasNext(){
+            return curr.next != tail;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("remove not supported here");
+        }
+
+        public Item next(){
+            if (!hasNext()){
+                throw new NoSuchElementException("No more element in the deque");
+            }
+            curr = curr.next;
+            return curr.item;
+        }
+    }
 
     // unit testing (optional)
     public static void main(String[] args){
@@ -109,15 +140,18 @@ public class Deque<Item>{
         StdOut.println("Deque has size: " + de.size());
 
         de.addFirst("first");
+        StdOut.println("After adding 1st item, deque has size: " + de.size());
         de.addFirst("second");
+        StdOut.println("After adding 2nd item, deque has size: " + de.size());
         de.addLast("third");
+        StdOut.println("After adding 3rd item, deque has size: " + de.size());
 
         StdOut.println("Before remove head: " + de.toString());
         StdOut.println("Is deque empty: " + de.isEmpty());
-        StdOut.println("Deque has size: " + de.size());
 
         String out = de.removeFirst();
-        StdOut.println("After remove head: " + de.toString());
+        StdOut.println("After remove first: " + de.toString());
+
     }
 }
 
