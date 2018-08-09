@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 //Implements Deque using a Linkedlist structure
 //public class Deque<Item> implements Iterable<Item>{
-public class Deque<Item>{
+public class Deque<Item> implements Iterable<Item>{
 
     private class Node{
         Item item;
@@ -27,7 +27,6 @@ public class Deque<Item>{
         tail = new Node(null);
         head.next = tail;
         tail.prev = head;
-
     }
 
     // is the deque empty?
@@ -70,16 +69,17 @@ public class Deque<Item>{
 
     @Override
     public String toString(){
+        Node newNode = head;
+
         String s = "[ ";
-        while (head.next != tail){
-            head = head.next;
-            s += head.item;
+        while (newNode.next != tail){
+            newNode = newNode.next;
+            s += newNode.item;
             s += " ";
         }
         s += "]";
         return s;
     }
-
 
     // remove and return the item from the front
     public Item removeFirst(){
@@ -134,22 +134,24 @@ public class Deque<Item>{
 
     // unit testing (optional)
     public static void main(String[] args){
-        Deque<String> de = new Deque<String>();
+        Deque<Integer> de = new Deque<Integer>();
 
         StdOut.println("Is deque empty: " + de.isEmpty());
         StdOut.println("Deque has size: " + de.size());
 
-        de.addFirst("first");
+        de.addFirst(0);
         StdOut.println("After adding 1st item, deque has size: " + de.size());
-        de.addFirst("second");
+
+        de.addFirst(1);
         StdOut.println("After adding 2nd item, deque has size: " + de.size());
-        de.addLast("third");
+
+        de.addLast(2);
         StdOut.println("After adding 3rd item, deque has size: " + de.size());
 
         StdOut.println("Before remove head: " + de.toString());
         StdOut.println("Is deque empty: " + de.isEmpty());
 
-        String out = de.removeFirst();
+        int out = de.removeFirst();
         StdOut.println("After remove first: " + de.toString());
 
     }
