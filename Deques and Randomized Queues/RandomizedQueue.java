@@ -2,7 +2,8 @@ import java.util.Iterator;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
-import java.lang.*;
+import java.lang.IllegalArgumentException;
+import java.lang.UnsupportedOperationException;
 import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item>{
@@ -38,7 +39,7 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     // add the item
     public void enqueue(Item item){
         if (item == null){
-            throw new java.lang.IllegalArgumentException("Do not enqueue with null");
+            throw new IllegalArgumentException("Do not enqueue with null");
         }
         if (n == array.length) resizing(array.length * 2);
         array[n++] = item;
@@ -47,7 +48,7 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     // remove and return a random item
     public Item dequeue(){
         if (isEmpty()){
-            throw new java.util.NoSuchElementException("Randomized Queue is empty. No more element");
+            throw new NoSuchElementException("Randomized Queue is empty. No more element");
         }
 
         int r = StdRandom.uniform(n);
@@ -64,19 +65,18 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
 
     @Override
     public String toString(){
-        String out = "[ ";
+        StringBuilder out = new StringBuilder();
         for (Item item:array){
-            out += item;
-            out += " ";
+            out.append(item + " ");
+
         }
-        out += "]";
-        return out;
+        return out.toString();
     }
 
     // return a random item (but do not remove it)
     public Item sample(){
         if(isEmpty()){
-            throw new java.util.NoSuchElementException("Randomized Queue is empty. No more element");
+            throw new NoSuchElementException("Randomized Queue is empty. No more element");
         }
         int rand = StdRandom.uniform(n);
         return array[rand];
@@ -90,11 +90,11 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
             return n != 0;
         }
 
-        public void remove() { throw new java.lang.UnsupportedOperationException("remove is not supported");}
+        public void remove() { throw new UnsupportedOperationException("remove is not supported");}
 
         public Item next(){
             if (!hasNext()){
-                throw new java.util.NoSuchElementException("Randomized Queue is empty. No more element");
+                throw new NoSuchElementException("Randomized Queue is empty. No more element");
             }
             return dequeue();
         }

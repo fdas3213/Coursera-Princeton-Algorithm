@@ -1,11 +1,15 @@
 import java.util.Iterator;
 import edu.princeton.cs.algs4.StdOut;
-import java.lang.*;
+import java.lang.IllegalArgumentException;
+import java.lang.UnsupportedOperationException;
 import java.util.NoSuchElementException;
 
-//Implements Deque using a Linkedlist structure
-//public class Deque<Item> implements Iterable<Item>{
+// Implements Deque using a Linkedlist structure
 public class Deque<Item> implements Iterable<Item>{
+
+    private final Node head;
+    private final Node tail;
+    private int size;
 
     private class Node{
         Item item;
@@ -16,10 +20,6 @@ public class Deque<Item> implements Iterable<Item>{
             this.item = item;
         }
     }
-
-    private Node head;
-    private Node tail;
-    private int size;
 
     // construct an empty deque with dummy head and tail
     public Deque() {
@@ -69,16 +69,15 @@ public class Deque<Item> implements Iterable<Item>{
 
     @Override
     public String toString(){
+        StringBuilder out = new StringBuilder();
+
         Node newNode = head;
 
-        String s = "[ ";
         while (newNode.next != tail){
             newNode = newNode.next;
-            s += newNode.item;
-            s += " ";
+            out.append(newNode.item + " ");
         }
-        s += "]";
-        return s;
+        return out.toString();
     }
 
     // remove and return the item from the front
@@ -151,7 +150,7 @@ public class Deque<Item> implements Iterable<Item>{
         StdOut.println("Before remove head: " + de.toString());
         StdOut.println("Is deque empty: " + de.isEmpty());
 
-        int out = de.removeFirst();
+        de.removeFirst();
         StdOut.println("After remove first: " + de.toString());
 
     }
