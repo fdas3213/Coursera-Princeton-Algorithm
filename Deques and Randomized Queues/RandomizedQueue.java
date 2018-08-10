@@ -1,7 +1,6 @@
 import java.util.Iterator;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
-
 import java.lang.IllegalArgumentException;
 import java.lang.UnsupportedOperationException;
 import java.util.NoSuchElementException;
@@ -11,34 +10,34 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     private int n;
 
     // construct an empty randomized queue
-    public RandomizedQueue(){
+    public RandomizedQueue() {
         array = (Item[]) new Object[2];
         n = 0;
     }
 
     // is the randomized queue empty?
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return n == 0;
     }
 
     // return the number of items on the randomized queue
-    public int size()  {
+    public int size() {
         return n;
     }
 
     //implement resizing method: double when full, halve when 1/2
-    private void resizing(int capacity){
+    private void resizing(int capacity) {
         assert capacity >= n;
         Item[] temp = (Item[]) new Object[capacity];
-        for (int i = 0; i < n; i ++){
+        for (int i = 0; i < n; i++) {
             temp[i] = array[i];
         }
         array = temp;
     }
 
     // add the item
-    public void enqueue(Item item){
-        if (item == null){
+    public void enqueue(Item item) {
+        if (item == null) {
             throw new IllegalArgumentException("Do not enqueue with null");
         }
         if (n == array.length) resizing(array.length * 2);
@@ -46,16 +45,15 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     }
 
     // remove and return a random item
-    public Item dequeue(){
-        if (isEmpty()){
+    public Item dequeue() {
+        if (isEmpty()) {
             throw new NoSuchElementException("Randomized Queue is empty. No more element");
         }
 
         int r = StdRandom.uniform(n);
         Item item = array[r];
-        for (int i = r; i < n-1; i ++){
-            array[i] = array[i+1];
-        }
+
+        if(r != n-1) array[r] = array[n-1];
         array[n-1] = null;
         n--;
 
@@ -66,16 +64,15 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     @Override
     public String toString(){
         StringBuilder out = new StringBuilder();
-        for (Item item:array){
+        for (Item item:array) {
             out.append(item + " ");
-
         }
         return out.toString();
     }
 
     // return a random item (but do not remove it)
-    public Item sample(){
-        if(isEmpty()){
+    public Item sample() {
+        if(isEmpty()) {
             throw new NoSuchElementException("Randomized Queue is empty. No more element");
         }
         int rand = StdRandom.uniform(n);
@@ -85,23 +82,40 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     // return an independent iterator over items in random order
     public Iterator<Item> iterator() {return new RQueueIterator();}
 
-    private class RQueueIterator implements Iterator<Item>{
-        public boolean hasNext(){
-            return n != 0;
+    private class RQueueIterator implements Iterator<Item> {
+        // uses an independent iterator
+        private int cur;
+        private Item[] dup;
+
+        public RQueueIterator() {
+            cur = 0;
+
+            dup = (Item[]) new Object[n];
+            for (int i = 0; i < n; i++){
+                dup[i] = array[i];
+            }
+            StdRandom.shuffle(dup);
+        }
+
+        public boolean hasNext() {
+            return cur < n;
         }
 
         public void remove() { throw new UnsupportedOperationException("remove is not supported");}
 
-        public Item next(){
-            if (!hasNext()){
+        public Item next() {
+            if (!hasNext()) {
                 throw new NoSuchElementException("Randomized Queue is empty. No more element");
             }
-            return dequeue();
+
+            Item item = dup[cur];
+            cur++;
+            return item;
         }
     }
 
     // unit testing (optional)
-    public static void main(String[] args){
+    public static void main(String[] args) {
         RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
 
         StdOut.println("is empty: " + rq.isEmpty());
@@ -124,6 +138,14 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
         int out2 = rq.dequeue();
         StdOut.println("2nd out element: " + out2);
         StdOut.println(rq.toString());
+        rq.enqueue(11);
+        rq.enqueue(19);
+
+        // Iterator test
+        for(Iterator<Integer> it = rq.iterator(); it.hasNext();){
+            int num = it.next();
+            StdOut.println(num);
+        }
     }
 
 }
