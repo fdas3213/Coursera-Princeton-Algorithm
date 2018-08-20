@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.Merge;
 import edu.princeton.cs.algs4.StdOut;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +66,7 @@ public class FastCollinearPoints {
     }
 
     private void checkDuplicate(Point[] points){
-        Merge.sort(points);
+        Arrays.sort(points);
         for (int i = 1; i <points.length; i++){
             if (points[i].slopeTo(points[i-1]) == Double.NEGATIVE_INFINITY){
                 throw new IllegalArgumentException("Duplicate points found");
