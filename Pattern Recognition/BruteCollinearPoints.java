@@ -1,40 +1,32 @@
 import edu.princeton.cs.algs4.StdOut;
-
+import edu.princeton.cs.algs4.Merge;
 import java.lang.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
 
-    int nSeg = 0;
-    private LineSegment[] Segs;
+    private ArrayList<LineSegment> Segs;
+    private Point[] copy;
 
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
-        if (points == null) {
-            throw new IllegalArgumentException("Argument to constructor is null");
+        checkNull(points);
+        copy = new Point[points.length];
+        for (int i =0;i<points.length;i++){
+            copy[i] = points[i];
         }
-        Arrays.sort(points);
-        if (points[0] == null){
-            throw new IllegalArgumentException("first element is null");
-        }
-        for (int i = 1; i < points.length; i++){
-            if (points[i] == null || points[i] == points[i-1]) {
-                throw new IllegalArgumentException("some element is null or there is duplicate");
-            }
-        }
+        checkDuplicate(copy);
+        Segs = new ArrayList<LineSegment>();
 
-        for (int i = 0; i < points.length - 3; i ++){
-            for (int j = i+ 1; j < points.length; j++){
-                double slope_a = points[i].slopeTo(points[j]);
-                for (int k = j + 1; k < points.length; k++){
-                    double slope_b = points[i].slopeTo(points[k]);
-                    StdOut.println("i: " + i + " j: " + j + " k: " + k);
-                    if (slope_a != slope_b) continue;
-                    for (int l = k + 1; l < points.length; l++){
-                        double slope_c = points[i].slopeTo(points[l]);
-                        StdOut.println("i: " + i + " j: " + j + " k: " + k + " l: "+ l);
-                        if (slope_a == slope_c) {
-                            Segs[nSeg++] = new LineSegment(points[i], points[l]);
+        for (int i = 0; i < copy.length - 3; i ++){
+            for (int j = i+ 1; j < copy.length; j++){
+                for (int k = j + 1; k < copy.length; k++){
+                    if (copy[i].slopeTo(copy[j]) == copy[i].slopeTo(copy[k])) {
+                        for (int l = k + 1; l < copy.length; l++) {
+                            if (copy[i].slopeTo(copy[j]) == copy[i].slopeTo(copy[l])) {
+                                Segs.add(new LineSegment(copy[i], copy[l]));
+                            }
                         }
                     }
                 }
@@ -42,14 +34,35 @@ public class BruteCollinearPoints {
         }
     }
 
+    private void checkNull(Point[] points){
+        if (points == null){
+            throw new IllegalArgumentException("Argument cannot be null");
+        }
+
+        for(Point p:points){
+            if (p == null){
+                throw new IllegalArgumentException("Some element is null");
+            }
+        }
+    }
+
+    private void checkDuplicate(Point[] points){
+        Merge.sort(points);
+        for (int i = 1; i <points.length; i++){
+            if (points[i].slopeTo(points[i-1]) == Double.NEGATIVE_INFINITY){
+                throw new IllegalArgumentException("Duplicate points found");
+            }
+        }
+    }
+
     // the number of line segments
     public int numberOfSegments() {
-        return nSeg;
+        return Segs.size();
     }
 
     // the line segments
     public LineSegment[] segments() {
-        return Segs;
+        return Segs.toArray(new LineSegment[numberOfSegments()]);
     }
 
     //unit test
@@ -59,7 +72,12 @@ public class BruteCollinearPoints {
                     new Point(7000, 3000), new Point(20000,21000), new Point(3000,4000),
                     new Point(14000,15000), new Point(6000,7000)};
 
+        // Testing segments() and numberOfSegments using ps now
+        StdOut.println("Test using first Point array");
         BruteCollinearPoints collinear = new BruteCollinearPoints(ps);
         StdOut.println(collinear.numberOfSegments());
+        for (LineSegment ls: collinear.segments()){
+            StdOut.println(ls.toString());
+        }
     }
 }

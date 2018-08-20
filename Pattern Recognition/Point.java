@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdRandom;
-
+import edu.princeton.cs.algs4.StdDraw;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -56,7 +55,7 @@ public class Point implements Comparable<Point> {
         else return (double)(that.y - this.y)/(that.x - this.x);
     }
 
-    private class BySlope implements Comparator<Point> {
+    private class SlopeOrder implements Comparator<Point> {
 
         public int compare(Point P1, Point P2) {
             double slope1 = slopeTo(P1);
@@ -69,7 +68,7 @@ public class Point implements Comparable<Point> {
 
     // compare two points by slopes they make with this point
     public Comparator<Point> slopeOrder() {
-        return new BySlope();
+        return new SlopeOrder();
     }
 
     // Unit test
