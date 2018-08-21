@@ -1,97 +1,131 @@
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
 public class FastCollinearPoints {
 
-    private ArrayList<LineSegment> Segs;
-    private Point[] copy;
+    private final ArrayList<LineSegment> Segs = new ArrayList<>();
+    private double[] slopeArray;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
-        Segs = new ArrayList<LineSegment>();
+        // initialize slopArray with -infinity
+        slopeArray = new double[points.length];
+        for(int i = 0;i<points.length;i++) {
+            slopeArray[i] = Double.NEGATIVE_INFINITY;
+        }
 
         checkNull(points);
-        copy = new Point[points.length];
-        for (int i =0;i<points.length;i++){
+        Point[] copy = new Point[points.length];
+        for (int i =0;i<points.length;i++) {
             copy[i] = points[i];
         }
-        checkDuplicate(points);
+        checkDuplicate(copy);
 
-        for (int i = 0;i < copy.length; i++){
-            Point[] newcopy = new Point[copy.length-i-1];
+        for (int i = 0;i < copy.length -1; i++) {
+            Point[] Pts = new Point[copy.length-i-1];
             double[] slopes = new double[copy.length-i-1];
 
             int idx = 0;
             for (int j = i + 1; j < copy.length; j++) {
                 slopes[idx] = copy[i].slopeTo(copy[j]);
-                newcopy[idx] = copy[j];
+                Pts[idx] = copy[j];
                 idx++;
             }
-            Arrays.sort(slopes);
-            Arrays.sort(newcopy, copy[i].slopeOrder());
 
-            int nEqual = 0;
-            for (int k = 0; k < slopes.length-1 && slopes[k]==slopes[k+1]; k++) {
-                nEqual++;
-            }
-            if (nEqual >= 3) {
-                i += nEqual;
-                Segs.add(new LineSegment(copy[i], copy[nEqual]));
-            }
+            // sort slopes by natural order
+            Arrays.sort(slopes);
+            // sort newcopy by the slopes they make with ith point
+            Arrays.sort(Pts, copy[i].slopeOrder());
+            addSegment(copy[i], slopes, Pts);
         }
     }
 
+    private void addSegment(Point p, double[] slopes, Point[] pts) {
+        int nEqual = 1;
+        double sameSlope = slopes[0];
+        for (int i = 1; i<slopes.length;i++) {
+            if (sameSlope != slopes[i]) {
+                sameSlope = slopes[i];
+            }else {
+                nEqual++;
+            }
+        }
+
+        if (nEqual >= 3 && !checkDupSlope(slopeArray, sameSlope)) {
+            slopeArray[numberOfSegments()] = sameSlope;
+            if (nEqual == slopes.length) Segs.add(new LineSegment(p, pts[nEqual-1]));
+            else Segs.add(new LineSegment(p, pts[nEqual]));
+        }
+    }
+
+    private Boolean checkDupSlope(double[] slopes, double slope) {
+        for (int i = 0;i < slopes.length;i++) {
+            if (slopes[i] == slope) return true;
+        }
+        return false;
+    }
+
     // the number of line segments
-    public int numberOfSegments(){
+    public int numberOfSegments() {
         return Segs.size();
     }
 
     // the line segments
-    public LineSegment[] segments(){
+    public LineSegment[] segments() {
         return Segs.toArray(new LineSegment[numberOfSegments()]);
     }
 
-    private void checkNull(Point[] points){
-        if (points == null){
+    private void checkNull(Point[] points) {
+        if (points == null) {
             throw new IllegalArgumentException("Argument cannot be null");
         }
 
-        for(Point p:points){
-            if (p == null){
+        for(Point p:points) {
+            if (p == null) {
                 throw new IllegalArgumentException("Some element is null");
             }
         }
     }
 
-    private void checkDuplicate(Point[] points){
+    private void checkDuplicate(Point[] points) {
         Arrays.sort(points);
-        for (int i = 1; i <points.length; i++){
-            if (points[i].slopeTo(points[i-1]) == Double.NEGATIVE_INFINITY){
+        for (int i = 1; i <points.length; i++) {
+            if (points[i].slopeTo(points[i-1]) == Double.NEGATIVE_INFINITY) {
                 throw new IllegalArgumentException("Duplicate points found");
             }
         }
     }
 
     //unit test
-    public static void main(String[] args){
-        //test using sample data from input8.txt
-        Point[] ps = {new Point(10000,0), new Point(0,10000), new Point(3000,7000),
-                new Point(7000, 3000), new Point(20000,21000), new Point(3000,4000),
-                new Point(14000,15000), new Point(6000,7000)};
-
-        Point[] p_arr2 = {new Point(19000,10000), new Point(18000,10000), new Point(32000,10000),
-                new Point(21000, 10000), new Point(1234,5678), new Point(14000,10000)};
-
-
-        // Testing segments() and numberOfSegments using ps now
-        StdOut.println("Test using 2nd Point array");
-        BruteCollinearPoints collinear = new BruteCollinearPoints(p_arr2);
-        StdOut.println(collinear.numberOfSegments());
-
-        for (LineSegment ls: collinear.segments()){
-            StdOut.println(ls.toString());
+    public static void main(String[] args) {
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
         }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
     }
 }
