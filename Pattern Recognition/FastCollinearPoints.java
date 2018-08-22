@@ -7,16 +7,9 @@ import java.util.Arrays;
 public class FastCollinearPoints {
 
     private final ArrayList<LineSegment> Segs = new ArrayList<>();
-    private double[] slopeArray;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
-        // initialize slopArray with -infinity
-        slopeArray = new double[points.length];
-        for(int i = 0;i<points.length;i++) {
-            slopeArray[i] = Double.NEGATIVE_INFINITY;
-        }
-
         checkNull(points);
         Point[] copy = new Point[points.length];
         for (int i =0;i<points.length;i++) {
@@ -25,45 +18,56 @@ public class FastCollinearPoints {
         checkDuplicate(copy);
 
         for (int i = 0;i < copy.length -1; i++) {
-            Point[] Pts = new Point[copy.length-i-1];
-            double[] slopes = new double[copy.length-i-1];
+            Point[] ptsA = new Point[copy.length-i-1];
+            double[] slopesB = new double[i];
 
-            int idx = 0;
-            for (int j = i + 1; j < copy.length; j++) {
-                slopes[idx] = copy[i].slopeTo(copy[j]);
-                Pts[idx] = copy[j];
-                idx++;
+            for (int k = 0; k < i; k++){
+                slopesB[k] = copy[i].slopeTo(copy[k]);
+            }
+
+            for (int j = 0; j < copy.length-i-1; j++){
+                ptsA[j] = copy[j+i+1];
             }
 
             // sort slopes by natural order
-            Arrays.sort(slopes);
+            Arrays.sort(slopesB);
             // sort newcopy by the slopes they make with ith point
-            Arrays.sort(Pts, copy[i].slopeOrder());
-            addSegment(copy[i], slopes, Pts);
+            Arrays.sort(ptsA, copy[i].slopeOrder());
+            addSegment(copy[i], slopesB, ptsA);
         }
     }
 
-    private void addSegment(Point p, double[] slopes, Point[] pts) {
-        int nEqual = 1;
-        double sameSlope = slopes[0];
-        for (int i = 1; i<slopes.length;i++) {
-            if (sameSlope != slopes[i]) {
-                sameSlope = slopes[i];
-            }else {
-                nEqual++;
+
+    private void addSegment(Point p, double[] slopesB, Point[] pointsA){
+        int count = 1;
+        double lastSlope = p.slopeTo(pointsA[0]);
+        for (int i = 1; i < pointsA.length;i++){
+            double slope = p.slopeTo(pointsA[i]);
+            if (slope != lastSlope){
+                if (count >= 3 && !BinarySearch(slope, slopesB)) {
+                    Segs.add(new LineSegment(p, pointsA[i-1]));
+                }
+                count = 1;
+            }else{
+                count ++;
             }
+            lastSlope = slope;
         }
 
-        if (nEqual >= 3 && !checkDupSlope(slopeArray, sameSlope)) {
-            slopeArray[numberOfSegments()] = sameSlope;
-            if (nEqual == slopes.length) Segs.add(new LineSegment(p, pts[nEqual-1]));
-            else Segs.add(new LineSegment(p, pts[nEqual]));
+        if(count >= 3 && !BinarySearch(lastSlope, slopesB)){
+            Segs.add(new LineSegment(p, pointsA[pointsA.length-1]));
         }
     }
 
-    private Boolean checkDupSlope(double[] slopes, double slope) {
-        for (int i = 0;i < slopes.length;i++) {
-            if (slopes[i] == slope) return true;
+    private Boolean BinarySearch(double s, double[] slopes){
+        int low = 0;
+        int high = slopes.length -1;
+
+        while(low <= high){
+            int mid = low + (high - low)/2;
+            if (s > slopes[mid]) low = mid + 1;
+            else if (s < slopes[mid]) high = mid-1;
+            else return true;
         }
         return false;
     }
