@@ -1,3 +1,4 @@
+import edu.princeton.cs.algs4.StdOut;
 import java.lang.*;
 import java.util.Arrays;
 
@@ -50,18 +51,17 @@ public class Board {
     public int manhattan() {
         int outofplace = 0;
         int new_i = 0, new_j = 0;
-        for (int i = 0; i < goalBoard.length; i++){
-            if (goalBoard[i] != 0) {
-                int idx = goalBoard[i]-1;
+        for (int k = 0; k < gameBoard.length; k++){
+            if (gameBoard[k] != 0) {
+                int idx = gameBoard[k]-1;
                 int old_i = idx / dimension;
                 int old_j = idx - old_i*dimension;
                 outofplace += Math.abs(old_i - new_i) + Math.abs(old_j - new_j);
             }
-            if (i% dimension ==0){
-                new_i = 0;
-                new_j ++;
-            }
-            new_i ++;
+            if ((k+1) % dimension ==0){
+                new_i ++;
+                new_j = 0;
+            }else new_j ++;
         }
         return outofplace;
     }
@@ -70,10 +70,49 @@ public class Board {
     public boolean isGoal() {
         return Arrays.equals(gameBoard,goalBoard);
     }
-    public Board twin()                    // a board that is obtained by exchanging any pair of blocks
-    public boolean equals(Object y)        // does this board equal y?
-    public Iterable<Board> neighbors()     // all neighboring boards
-    public String toString()               // string representation of this board (in the output format specified below)
 
-    public static void main(String[] args) // unit tests (not graded)
+    // string representation of this board (in the output format specified below)
+    @Override
+    public String toString(){
+        StringBuilder s = new StringBuilder();
+        s.append(dimension + "\n");
+        for (int i = 0; i < gameBoard.length; i++){
+            s.append(String.format("%2d ", gameBoard[i]));
+            if ((i+1) % 3 == 0) s.append("\n");
+        }
+        return s.toString();
+    }
+
+    /*
+    // all neighboring boards
+    public Iterable<Board> neighbors(){
+
+    }
+
+    // a board that is obtained by exchanging any pair of blocks
+    public Board twin(){
+
+    }
+    */
+
+    // does this board equal y?
+    @Override
+    public boolean equals(Object y){
+        if (y == this) return true;
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
+        Board that = (Board) y;
+        return (this.dimension == that.dimension) && (this.gameBoard == that.gameBoard);
+    }
+
+    // unit tests (not graded)
+    public static void main(String[] args){
+        int[][] test = {{8,1,3}, {4,0,2}, {7,6,5}};
+        // test dimension and toString()
+        Board tBoard = new Board(test);
+        StdOut.println(tBoard.toString());
+        // test hamming and manhattan priority
+        StdOut.println("hamming priority should be 5, and is: " + tBoard.hamming());
+        StdOut.println("manhattan priority should be 10, and is: " + tBoard.manhattan());
+    }
 }
