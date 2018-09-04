@@ -149,7 +149,13 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin(){
-
+        int[] copy = copyOf(gameBoard);
+        if (blankRow != 0) {
+            swap(copy, 0,1);
+        }else{
+            swap(copy, dimension,dimension+1);
+        }
+        return new Board(to2D(copy));
     }
 
     // does this board equal y?
